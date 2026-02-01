@@ -180,17 +180,23 @@
     }
 
     // --- BUTTON LOGIC ---
-    yesBtn.addEventListener("click", () => {
-      msg.textContent = "YAY!! 💕 I can’t wait 😌";
-      ps.style.display = "block";
-      restartBtn.style.display = "inline-block";
+   yesBtn.addEventListener("click", () => {
+  // Reset button sizes to default
+  yesScale = 1.0;
+  noScale = 1.0;
+  applyButtonSizing();
 
-      noBtn.disabled = true;
-      noBtn.style.opacity = 0.5;
-      noBtn.classList.remove("shake");
+  msg.textContent = "YAY!! 💕 I can’t wait 😌";
+  ps.style.display = "block";
+  restartBtn.style.display = "inline-block";
 
-      confettiBurst();
-    });
+  noBtn.disabled = true;
+  noBtn.style.opacity = 0.5;
+  noBtn.classList.remove("shake");
+
+  confettiBurst();
+});
+
 
   // Ordered messages — original ones kept, "10 years..." is ALWAYS last
 const noMessages = [
