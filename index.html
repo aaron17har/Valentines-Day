@@ -192,12 +192,14 @@
       confettiBurst();
     });
 
-    // Ordered messages — "10 years..." is intentionally last
+  // Ordered messages — original ones kept, "10 years..." is ALWAYS last
 const noMessages = [
-  "Stop playing.",
-  "You know you want to.",
-  "Think about what you’re doing.",
-  "I'm gonna steal Milo if you keep clicking no.",
+  "I know you are lying",
+  "Stop playing",
+  "You know you want to",
+  "Think about what you’re doing",
+  "I'm unloved.",
+  "I'm gonna steal Milo if you keep clicking no",
   "10 years..."
 ];
 
@@ -206,19 +208,20 @@ noBtn.addEventListener("click", () => {
 
   // Scale buttons
   yesScale *= 1.10;
-  noScale *= 0.90;
+  noScale  *= 0.90;
   noScale = Math.max(noScale, 0.25);
   applyButtonSizing();
 
-  // Pick message (cap at last index so "10 years..." is always final)
+  // Message selection (caps at last message)
   const msgIndex = Math.min(noClicks - 1, noMessages.length - 1);
   msg.textContent = noMessages[msgIndex];
 
-  // Start shaking once we hit the final message
+  // Start shaking once we reach "10 years..."
   if (msgIndex === noMessages.length - 1) {
     noBtn.classList.add("shake");
   }
 });
+
 
     restartBtn.addEventListener("click", resetEverything);
 
