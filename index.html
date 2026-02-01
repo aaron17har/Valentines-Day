@@ -16,6 +16,7 @@
       justify-content: center;
       overflow: hidden;
     }
+
     .card {
       background: white;
       padding: 30px;
@@ -25,6 +26,7 @@
       max-width: 460px;
       z-index: 1;
     }
+
     button {
       font-size: 18px;
       padding: 10px 18px;
@@ -36,15 +38,21 @@
       transform-origin: center;
       white-space: nowrap;
     }
+
     #yes { background: #ff4d6d; color: white; }
     #no  { background: #e9ecef; }
-    #restart { background: #111827; color: white; display: none; }
+    #restart {
+      background: #111827;
+      color: white;
+      display: none;
+    }
 
     #msg {
       margin-top: 16px;
       font-size: 18px;
       min-height: 1.2em;
     }
+
     #ps {
       margin-top: 10px;
       font-size: 14px;
@@ -52,6 +60,7 @@
       display: none;
     }
 
+    /* Shake animation */
     @keyframes shake {
       0% { transform: translateX(0); }
       20% { transform: translateX(-6px); }
@@ -60,6 +69,7 @@
       80% { transform: translateX(6px); }
       100% { transform: translateX(0); }
     }
+
     .shake {
       animation: shake 0.4s ease-in-out infinite;
     }
@@ -77,8 +87,8 @@
   <canvas id="confetti"></canvas>
 
   <div class="card">
-    <h1 id="title">Nicole ❤️</h1>
-    <p id="question">Will you be my Valentine?</p>
+    <h1>Nicole ❤️</h1>
+    <p>Will you be my Valentine?</p>
 
     <button id="yes">Yes 💘</button>
     <button id="no">No 😅</button>
@@ -102,6 +112,16 @@
     let noScale = 1.0;
     let noClicks = 0;
 
+    const noMessages = [
+      "I know you are lying.",
+      "Stop playing",
+      "You know you want to",
+      "Think about what you’re doing",
+      "I'm unloved.",
+      "I'm gonna steal Milo if you keep clicking no",
+      "10 years..."
+    ];
+
     function applyButtonSizing() {
       yesBtn.style.transform = `scale(${yesScale})`;
       noBtn.style.transform = `scale(${noScale})`;
@@ -109,25 +129,7 @@
       noBtn.style.fontSize = baseNoFont * noScale + "px";
     }
 
-    function resetEverything() {
-      yesScale = 1.0;
-      noScale = 1.0;
-      noClicks = 0;
-
-      msg.textContent = "";
-      ps.style.display = "none";
-      restartBtn.style.display = "none";
-
-      noBtn.disabled = false;
-      noBtn.style.opacity = 1;
-      noBtn.classList.remove("shake");
-
-      applyButtonSizing();
-
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
-
-    // --- CONFETTI ---
+    /* ---------- CONFETTI ---------- */
     const canvas = document.getElementById("confetti");
     const ctx = canvas.getContext("2d");
 
@@ -179,57 +181,65 @@
       requestAnimationFrame(tick);
     }
 
-    // --- BUTTON LOGIC ---
-   yesBtn.addEventListener("click", () => {
-  // Reset button sizes to default
-  yesScale = 1.0;
-  noScale = 1.0;
-  applyButtonSizing();
+    /* ---------- BUTTON LOGIC ---------- */
+    yesBtn.addEventListener("click", () => {
+      // FULL reset of button sizes
+      yesScale = 1.0;
+      noScale = 1.0;
+      yesBtn.style.transform = "";
+      noBtn.style.transform = "";
+      yesBtn.style.fontSize = "";
+      noBtn.style.fontSize = "";
+      applyButtonSizing();
 
-  msg.textContent = "YAY!! 💕 I can’t wait 😌";
-  ps.style.display = "block";
-  restartBtn.style.display = "inline-block";
+      msg.textContent = "YAY!! 💕 I can’t wait 😌";
+      ps.style.display = "block";
+      restartBtn.style.display = "inline-block";
 
-  noBtn.disabled = true;
-  noBtn.style.opacity = 0.5;
-  noBtn.classList.remove("shake");
+      noBtn.disabled = true;
+      noBtn.style.opacity = 0.5;
+      noBtn.classList.remove("shake");
 
-  confettiBurst();
-});
+      confettiBurst();
+    });
 
+    noBtn.addEventListener("click", () => {
+      noClicks++;
 
-  // Ordered messages — original ones kept, "10 years..." is ALWAYS last
-const noMessages = [
-  "I know you are lying",
-  "Stop playing",
-  "You know you want to",
-  "Think about what you’re doing",
-  "I'm unloved.",
-  "I'm gonna steal Milo if you keep clicking no",
-  "10 years..."
-];
+      yesScale *= 1.10;
+      noScale *= 0.90;
+      noScale = Math.max(noScale, 0.25);
+      applyButtonSizing();
 
-noBtn.addEventListener("click", () => {
-  noClicks++;
+      const index = Math.min(noClicks - 1, noMessages.length - 1);
+      msg.textContent = noMessages[index];
 
-  // Scale buttons
-  yesScale *= 1.10;
-  noScale  *= 0.90;
-  noScale = Math.max(noScale, 0.25);
-  applyButtonSizing();
+      if (index === noMessages.length - 1) {
+        noBtn.classList.add("shake");
+      }
+    });
 
-  // Message selection (caps at last message)
-  const msgIndex = Math.min(noClicks - 1, noMessages.length - 1);
-  msg.textContent = noMessages[msgIndex];
+    restartBtn.addEventListener("click", () => {
+      yesScale = 1.0;
+      noScale = 1.0;
+      noClicks = 0;
 
-  // Start shaking once we reach "10 years..."
-  if (msgIndex === noMessages.length - 1) {
-    noBtn.classList.add("shake");
-  }
-});
+      msg.textContent = "";
+      ps.style.display = "none";
+      restartBtn.style.display = "none";
 
+      noBtn.disabled = false;
+      noBtn.style.opacity = 1;
+      noBtn.classList.remove("shake");
 
-    restartBtn.addEventListener("click", resetEverything);
+      yesBtn.style.transform = "";
+      noBtn.style.transform = "";
+      yesBtn.style.fontSize = "";
+      noBtn.style.fontSize = "";
+
+      applyButtonSizing();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    });
 
     applyButtonSizing();
   </script>
